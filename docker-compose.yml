@@ -1,0 +1,44 @@
+version: "3.3"
+
+networks:
+  default:
+    driver: bridge
+
+services:
+  nginx:
+    image: nginx
+    restart: always
+    volumes:
+      - ./nginx:/etc/nginx/sites-enabled
+    ports:
+      - 80:80
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=realistikosu
+    restart: always
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    ports:
+      - 1000:5432
+
+  redis:
+    image: redis
+    restart: always
+    command: redis-server
+    ports:
+      - 2000:6379
+    volumes:
+      - ./redis:/data
+
+  bancho-service:
+    image: bancho-service:latest
+    ports:
+      - 3000:80
+    volumes:
+      - ./services/bancho-service:/bancho-service
+    depends_on:
+      - nginx
+      - postgres
+      - redis
